@@ -1,0 +1,18 @@
+{% extends "admin/layout.html" %}
+{% block title %}{{ _("Image Uploader") }}{% endblock %}
+{% block contents %}
+<h2>{{ _("Image Uploader") }}</h2>
+<p>{% trans %}
+{% endtrans %}</p>
+<div>
+    <form method="GET" action="">
+        <ul>
+            <li> <label for="images_directory">Images directory</label>
+            <input id="images_directory" name="images_directory" value="{{ images_directory }}"></input></li>
+            <li><label for="base_url">base url for images</label>
+            <input id="base_url" name="base_url" value="{{ base_url }}"></input></li>
+            <li>
+            <input type="submit"></input></li>
+    </form>
+</div>
+{% endblock %}

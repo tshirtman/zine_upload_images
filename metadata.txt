@@ -1,0 +1,7 @@
+Name: image uploader
+Plugin URL: 
+Author: gabriel pettier
+Author URL: tshirtman.fr
+License: BSD
+Version: 0.1
+Description: add an image uploader to articles.
