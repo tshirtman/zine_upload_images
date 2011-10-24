@@ -78,13 +78,13 @@ def show_image_manager_options(req):
 
     if thumb_max_width:
         try:
-            req.app.cfg.change_single('img_upload/thumb_max_width', max_width_thumb)
+            req.app.cfg.change_single('img_upload/thumb_max_width', thumb_max_width)
         except ConfigurationTransactionError, e:
             flash(_('The thumb max width could not be changed.'), 'error')
 
     if thumb_max_height:
         try:
-            req.app.cfg.change_single('img_upload/thumb_max_height', max_height_thumb)
+            req.app.cfg.change_single('img_upload/thumb_max_height', thumb_max_height)
         except ConfigurationTransactionError, e:
             flash(_('The thumb max height could not be changed.'), 'error')
 
