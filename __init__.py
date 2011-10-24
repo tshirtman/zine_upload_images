@@ -9,9 +9,10 @@
     :license: BSD, see LICENSE for more details.
 """
 import os
-from os.path import dirname, join
+from os.path import dirname, join, splitext
 from random import choice
 from string import letters
+import PIL.Image as PIL
 
 from zine.api import *
 from zine.views.admin import render_admin_response
@@ -60,6 +61,9 @@ def add_image_manager_link(req, navigation_bar):
 def show_image_manager_options(req):
     image_dir = req.args.get('images_directory')
     base_url = req.args.get('base_url')
+    thumb_max_width = req.args.get('thumb_max_width')
+    thumb_max_height = req.args.get('thumb_max_height')
+
     if image_dir:
         try:
             req.app.cfg.change_single('img_upload/images_directory', image_dir)
@@ -72,9 +76,23 @@ def show_image_manager_options(req):
         except ConfigurationTransactionError, e:
             flash(_('The base url could not be changed.'), 'error')
 
+    if thumb_max_width:
+        try:
+            req.app.cfg.change_single('img_upload/thumb_max_width', max_width_thumb)
+        except ConfigurationTransactionError, e:
+            flash(_('The thumb max width could not be changed.'), 'error')
+
+    if thumb_max_height:
+        try:
+            req.app.cfg.change_single('img_upload/thumb_max_height', max_height_thumb)
+        except ConfigurationTransactionError, e:
+            flash(_('The thumb max height could not be changed.'), 'error')
+
     return render_admin_response('admin/img_uploader.html',
             images_directory=req.app.cfg['img_upload/images_directory'],
-            base_url=req.app.cfg['img_upload/base_url'])
+            base_url=req.app.cfg['img_upload/base_url'],
+            thumb_max_width=req.app.cfg['img_upload/thumb_max_width'],
+            thumb_max_height=req.app.cfg['img_upload/thumb_max_height'])
 
 @require_privilege(BLOG_ADMIN)
 def upload_image(req):
@@ -83,12 +101,21 @@ def upload_image(req):
     image = req.files['userfile']
     if "image" in image.content_type:
         name = image.filename
-        while name in os.listdir(req.app.cfg['img_upload/images_directory']):
-            name = '.'.join(name.split('.')[:-1]) + choice(letters) + '.' + name.split('.')[-1]
+        name, ext = splitext(name)
+        while name+ext in os.listdir(req.app.cfg['img_upload/images_directory']):
+            name += choice(letters)
 
-        image.save(os.path.join(req.app.cfg['img_upload/images_directory'], name))
+        image.save(os.path.join(req.app.cfg['img_upload/images_directory'], name+ext))
 
-        return '&lt;img src="'+req.app.cfg['img_upload/base_url']+'/'+name+'"&gt;&lt;/img&gt;<br />'
+        size = int(req.app.cfg['img_upload/thumb_max_width'] or 2000), int(req.app.cfg['img_upload/thumb_max_height'] or 2000)
+        img = PIL.open(req.app.cfg['img_upload/images_directory']+'/'+name+ext)
+        img.thumbnail(size, PIL.ANTIALIAS)
+        img.save(req.app.cfg['img_upload/images_directory']+'/'+name+'_tn'+ext)
+
+        return ''.join((
+            '&lt;a href="', req.app.cfg['img_upload/base_url'], '/', name, ext,
+            '"&gt;&lt;img src="', req.app.cfg['img_upload/base_url'], '/', name,
+            '_tn', ext, '"&gt;&lt;/img&gt;&lt;a&gt;<br />'))
 
 
 def setup(app, plugin):
@@ -100,6 +127,8 @@ def setup(app, plugin):
     app.connect_event('modify-admin-navigation-bar', add_image_manager_link)
 
     app.add_config_var('img_upload/images_directory', TextField(default=''))
+    app.add_config_var('img_upload/thumb_max_width', TextField(default=''))
+    app.add_config_var('img_upload/thumb_max_height', TextField(default=''))
     app.add_config_var('img_upload/base_url', TextField(default=''))
     app.add_servicepoint('img_upload/upload', upload_image)
 

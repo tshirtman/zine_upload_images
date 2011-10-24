@@ -6,13 +6,27 @@
 {% endtrans %}</p>
 <div>
     <form method="GET" action="">
-        <ul>
-            <li> <label for="images_directory">Images directory</label>
-            <input id="images_directory" name="images_directory" value="{{ images_directory }}"></input></li>
-            <li><label for="base_url">base url for images</label>
-            <input id="base_url" name="base_url" value="{{ base_url }}"></input></li>
-            <li>
-            <input type="submit"></input></li>
+        <table>
+            <tr>
+                <td><label for="images_directory">Images directory</label></td>
+                <td><input id="images_directory" name="images_directory" value="{{ images_directory }}"></input></td>
+            </tr>
+            <tr>
+                <td><label for="base_url">base url for images</label></td>
+                <td><input id="base_url" name="base_url" value="{{ base_url }}"></input></td>
+            </tr>
+            <tr>
+                <td><label for="thumb_max_width">max width for thumbnails</label></td>
+                <td><input id="thumb_max_width" name="thumb_max_width" value="{{ thumb_max_width}}"></input></td>
+            </tr>
+            <tr>
+                <td><label for="thumb_max_height">max height for thumbnails</label></td>
+                <td><input id="thumb_max_height" name="thumb_max_height" value="{{ thumb_max_height}}"></input></td>
+            </tr>
+            <tr>
+                <td><input type="submit"></input></td>
+            </tr>
+        </table>
     </form>
 </div>
 {% endblock %}
