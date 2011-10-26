@@ -37,7 +37,14 @@ def inject_image_form(req, context):
         new AjaxUpload("img_upload", {
             action: "/_services/json/img_upload/upload",
             responseType: "json",
-            onComplete: function(file, response){$('#img_upload').after(response)},
+            onComplete: function(file, response){
+                if (typeof(ckeditor) != 'undefined')
+                    ckeditor.insertHtml(response);
+                else {
+                    t = $('#f_text')
+                    t.val(t.val() + response);
+                }
+            }
             });
         })
         </script>''');
@@ -113,9 +120,9 @@ def upload_image(req):
         img.save(req.app.cfg['img_upload/images_directory']+'/'+name+'_tn'+ext)
 
         return ''.join((
-            '&lt;a href="', req.app.cfg['img_upload/base_url'], '/', name, ext,
-            '"&gt;&lt;img src="', req.app.cfg['img_upload/base_url'], '/', name,
-            '_tn', ext, '"&gt;&lt;/img&gt;&lt;a&gt;<br />'))
+            '<a href="', req.app.cfg['img_upload/base_url'], '/', name, ext,
+            '"><img src="', req.app.cfg['img_upload/base_url'], '/', name,
+            '_tn', ext, '"></img><a><br />'))
 
 
 def setup(app, plugin):
